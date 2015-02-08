@@ -667,20 +667,21 @@ public class Utils {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix = "cjay-log-" + today;
+        // String prefix = "cjay-log-" + today;
         String time = StringUtils.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().contains(prefix)) {
+            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
+                    buf.append(time);
                     if (object instanceof Session) {
                         Session session = (Session) object;
-                        buf.append(time + " | Begin to upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
+                        buf.append("Upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
                     } else if (object instanceof AuditItem) {
                         AuditItem item = (AuditItem) object;
-                        buf.append(time + " | Begin to upload item: " + item.getComponentCode()
+                        buf.append("Upload item: " + item.getComponentCode()
                                 + " " + item.getDamageCode() + " " + item.getRepairCode()
                                 + "| ContainerID: " + containerId);
                     } else {
@@ -705,10 +706,10 @@ public class Utils {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String fileName = "cjay-log-" + today + "-" + uuid + ".txt";
+        // String fileName = "cjay-log-" + today + "-" + uuid + ".txt";
         File logFile =
                 new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS), fileName);
+                        Environment.DIRECTORY_DOWNLOADS), CJayConstant.CJAY_LOG_ALPHA);
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
@@ -724,11 +725,11 @@ public class Utils {
     public static void uploadLogFile(Context context) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix = "cjay-log-" + today;
+        // String prefix = "cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().contains(prefix)) {
+            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
                 Logger.w(f.getAbsolutePath());
                 NetworkClient_.getInstance_(context).uploadLogFile(f.getAbsolutePath(), f.getName());
             }
@@ -738,11 +739,11 @@ public class Utils {
     public static void writeErrorsToLogFile(String errorString) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix = "cjay-log-" + today;
+        // String prefix = "cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().contains(prefix)) {
+            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
                     buf.append(errorString);

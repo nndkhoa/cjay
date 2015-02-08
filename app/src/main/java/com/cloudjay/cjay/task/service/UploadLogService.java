@@ -36,11 +36,11 @@ public class UploadLogService extends IntentService {
 
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
-        String prefix = "cjay-log-" + today;
+        // String prefix = "cjay-log-" + today;
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().contains(prefix)) {
+            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
                 networkClient.uploadLogFile(f.getAbsolutePath(), f.getName());
             } else {
                 Utils.writeErrorsToLogFile("can not find file to upload");
