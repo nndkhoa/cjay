@@ -185,7 +185,7 @@ public class Utils {
 //                CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
         // Start get log from device (02/01/2015)
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(),
-                30 * 1000, pLogIntent);
+		        30 * 1000, pLogIntent);
 
         // --------
         // Configure Pubnub Service
