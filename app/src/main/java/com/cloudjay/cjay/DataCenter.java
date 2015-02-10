@@ -715,7 +715,7 @@ public class DataCenter {
 		} catch (SnappydbException e) {
 			Utils.writeErrorsToLogFile(e.toString());
 		} catch (KryoException e) {
-			e.printStackTrace();
+            Utils.writeErrorsToLogFile(e.toString());
 		} finally {
 			return session;
 		}
