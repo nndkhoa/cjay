@@ -128,7 +128,7 @@ public class DataCenter {
 				return user;
 			}
 		} catch (SnappydbException error) {
-			Utils.writeErrorsToLRogFile(error.toString());
+			Utils.writeErrorsToLogFile(error.toString());
 		}
 		return null;
 	}
@@ -158,7 +158,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			db.put(CJayConstant.PREFIX_USER, user);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 
@@ -184,7 +184,7 @@ public class DataCenter {
 				db.put(CJayConstant.PREFIX_OPERATOR + operator.getOperatorCode(), operator);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 	}
@@ -204,7 +204,7 @@ public class DataCenter {
 				operators.add(operator);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 		return operators;
 	}
@@ -225,7 +225,7 @@ public class DataCenter {
 			db.put(key, operator);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 	//endregion
@@ -262,7 +262,7 @@ public class DataCenter {
 				db.put(key, code);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -282,7 +282,7 @@ public class DataCenter {
 				db.put(key, code);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -302,7 +302,7 @@ public class DataCenter {
 				db.put(key, code);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -332,7 +332,7 @@ public class DataCenter {
 			db.put(key, isoCode);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -356,7 +356,7 @@ public class DataCenter {
 
 			return isoCodes;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 		return null;
 	}
@@ -413,7 +413,7 @@ public class DataCenter {
 			}
 			return isoCode;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 		return null;
 	}
@@ -458,7 +458,7 @@ public class DataCenter {
 
 			return true;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		return false;
@@ -505,7 +505,7 @@ public class DataCenter {
 			context.startActivity(intent);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 	}
@@ -532,7 +532,7 @@ public class DataCenter {
 			EventBus.getDefault().post(new ContainerGotEvent(session, containerId));
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -611,7 +611,7 @@ public class DataCenter {
 				}
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -657,7 +657,7 @@ public class DataCenter {
 				searchAsync(context, keyword, searchInImportFragment);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -693,7 +693,7 @@ public class DataCenter {
 
 			EventBus.getDefault().post(new ContainerSearchedEvent(sessions, searchInImportFragment));
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		} catch (RetrofitError error) {
 			EventBus.getDefault().post(new ContainerSearchedEvent(true));
 		}
@@ -713,7 +713,7 @@ public class DataCenter {
 			String key = containerId;
 			session = db.getObject(key, Session.class);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		} catch (KryoException e) {
 			e.printStackTrace();
 		} finally {
@@ -732,7 +732,7 @@ public class DataCenter {
 			db = App.getDB(context);
 			keysResult = db.findKeys(prefix);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		for (String result : keysResult) {
@@ -743,7 +743,7 @@ public class DataCenter {
 				session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			} catch (SnappydbException e) {
-				Utils.writeErrorsToLRogFile(e.toString());
+				Utils.writeErrorsToLogFile(e.toString());
 				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
 			}
 		}
@@ -762,7 +762,7 @@ public class DataCenter {
 			db = App.getDB(context);
 			keysResult = db.findKeys(prefix + keyword);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		for (String result : keysResult) {
@@ -773,7 +773,7 @@ public class DataCenter {
 				session = db.getObject(newKey, Session.class);
 				sessions.add(session);
 			} catch (SnappydbException e) {
-				Utils.writeErrorsToLRogFile(e.toString());
+				Utils.writeErrorsToLogFile(e.toString());
 				addLog(context, newKey, prefix + " | Cannot retrieve this container", CJayConstant.PREFIX_LOG);
 			}
 		}
@@ -798,7 +798,7 @@ public class DataCenter {
 			session = db.getObject(key, Session.class);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		} finally {
 			return session;
 		}
@@ -812,7 +812,7 @@ public class DataCenter {
 			db.del(key);
 			return true;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			return false;
 		}
 	}
@@ -842,7 +842,7 @@ public class DataCenter {
 			session = object;
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			// This container is not exist in db, so we add it to db
 			try {
 				// Only localize container if it is from server
@@ -853,7 +853,7 @@ public class DataCenter {
 					db.put(key, session);
 				}
 			} catch (SnappydbException e1) {
-				Utils.writeErrorsToLRogFile(e.toString());
+				Utils.writeErrorsToLogFile(e.toString());
 				Logger.w(e1.getMessage());
 				return null;
 			}
@@ -876,7 +876,7 @@ public class DataCenter {
 			db.put(key, session);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -895,7 +895,7 @@ public class DataCenter {
 			db.put(key, session);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -946,7 +946,7 @@ public class DataCenter {
 			Logger.Log("add AuditImage To AuditedIssue successfully");
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		EventBus.getDefault().post(new IssueMergedEvent(containerId, auditItemRemove));
@@ -983,7 +983,7 @@ public class DataCenter {
 				}
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		return null;
@@ -1005,7 +1005,7 @@ public class DataCenter {
 			String key = containerId;
 			db.put(key, session);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1061,7 +1061,7 @@ public class DataCenter {
 
 			EventBus.getDefault().post(new AuditItemChangedEvent(containerId));
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1133,7 +1133,7 @@ public class DataCenter {
 				db.put(key, session);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1142,7 +1142,7 @@ public class DataCenter {
 			DB db = App.getDB(context);
 			db.put(CJayConstant.PREFIX_RAINY_MODE_IMAGE + uuid, rainyImageUrl);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1162,7 +1162,7 @@ public class DataCenter {
 			EventBus.getDefault().post(new RainyImagesGotEvent(imageUrls));
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 		return imageUrls;
 	}
@@ -1183,7 +1183,7 @@ public class DataCenter {
 			EventBus.getDefault().post(new RainyImagesDeletedEvent());
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1294,7 +1294,7 @@ public class DataCenter {
 
 			return logUploads;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			return null;
 		}
 	}
@@ -1320,7 +1320,7 @@ public class DataCenter {
 
 			return logUploads;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			return null;
 		}
 	}
@@ -1358,7 +1358,7 @@ public class DataCenter {
 			db.put(key, log);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 	//endregion
@@ -1401,7 +1401,7 @@ public class DataCenter {
 				return true;
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 		return false;
 	}
@@ -1419,7 +1419,7 @@ public class DataCenter {
 			return true;
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			return false;
 		}
 	}
@@ -1506,7 +1506,7 @@ public class DataCenter {
 
 			return true;
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		return false;
@@ -1563,7 +1563,7 @@ public class DataCenter {
 			session.changeAuditItemUploadStatus(containerId, itemUuid, status);
 			db.put(containerId, session);
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1587,7 +1587,7 @@ public class DataCenter {
 			}
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 			return null;
 		}
 	}
@@ -1624,7 +1624,7 @@ public class DataCenter {
 			db.put(key, object);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1640,7 +1640,7 @@ public class DataCenter {
 				db.del(keys[0]);
 			}
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 
@@ -1661,7 +1661,7 @@ public class DataCenter {
 			}
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 
 		return object;
@@ -1754,7 +1754,7 @@ public class DataCenter {
 			context.startActivity(intent);
 
 		} catch (SnappydbException e) {
-			Utils.writeErrorsToLRogFile(e.toString());
+			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
 }

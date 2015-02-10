@@ -185,7 +185,7 @@ public class Utils {
 //                CJayConstant.ALARM_INTERVAL * 1000, pSyncIntent);
         // Start get log from device (02/01/2015)
         alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime.getTimeInMillis(),
-                30 * 1000, pLogIntent);
+		        30 * 1000, pLogIntent);
 
         // --------
         // Configure Pubnub Service
@@ -736,7 +736,7 @@ public class Utils {
         }
     }
 
-    public static void writeErrorsToLRogFile(String errorString) {
+    public static void writeErrorsToLogFile(String errorString) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
         // String prefix = "cjay-log-" + today;

@@ -205,10 +205,7 @@ public class PubnubService extends Service {
 					Logger.Log("Depot channel: " + depotChannel);
 					Logger.Log("UUID channel: " + uuidChannel);
 
-				} catch (SnappydbException e) {
-					e.printStackTrace();
-
-				} catch (NullCredentialException e) {
+				}  catch (NullCredentialException e) {
 
 					// Log out instantly and stop Pubnub Service also
 					Utils.logOut(getApplicationContext());
