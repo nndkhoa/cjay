@@ -736,7 +736,7 @@ public class Utils {
         }
     }
 
-    public static void writeErrorsToLogFile(String errorString) {
+    public static void writeErrorsToLRogFile(String errorString) {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
         // String prefix = "cjay-log-" + today;
