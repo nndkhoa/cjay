@@ -205,6 +205,10 @@ public class DataCenter {
             }
         } catch (SnappydbException e) {
             Utils.writeErrorsToLogFile(e.toString());
+        } catch (KryoException e) {
+            Utils.showCrouton((android.app.Activity) context,
+                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+            e.printStackTrace();
         }
         return operators;
     }
@@ -717,6 +721,9 @@ public class DataCenter {
             Utils.writeErrorsToLogFile(e.toString());
         } catch (KryoException e) {
             Utils.writeErrorsToLogFile(e.toString());
+            Utils.showCrouton((android.app.Activity) context,
+                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+            e.printStackTrace();
         } finally {
             return session;
         }
@@ -734,6 +741,10 @@ public class DataCenter {
             keysResult = db.findKeys(prefix);
         } catch (SnappydbException e) {
             Utils.writeErrorsToLogFile(e.toString());
+        } catch (KryoException e) {
+            Utils.showCrouton((android.app.Activity) context,
+                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+            e.printStackTrace();
         }
 
         for (String result : keysResult) {
@@ -862,6 +873,10 @@ public class DataCenter {
                 Logger.w(e1.getMessage());
                 return null;
             }
+        }  catch (KryoException e) {
+            Utils.showCrouton((android.app.Activity) context,
+                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+            e.printStackTrace();
         }
 
         return session;
