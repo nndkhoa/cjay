@@ -675,15 +675,17 @@ public class Utils {
             if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
-                    buf.append(time);
+                    buf.append(time + "| ");
                     if (object instanceof Session) {
                         Session session = (Session) object;
-                        buf.append("Upload ContainerID: " + session.getContainerId() + "| Step: " + session.getLocalStep());
+                        buf.append("ContainerID: " + session.getContainerId() + "| Upload Container, step: " + session.getLocalStep());
                     } else if (object instanceof AuditItem) {
                         AuditItem item = (AuditItem) object;
-                        buf.append("Upload item: " + item.getComponentCode()
-                                + " " + item.getDamageCode() + " " + item.getRepairCode()
-                                + "| ContainerID: " + containerId);
+                        buf.append("ContainerID: " + containerId + "| Upload item: "
+                                + item.getComponentCode() + "| "
+                                + item.getDamageCode() + "| "
+                                + item.getRepairCode() + "| "
+                                + item.getLocationCode());
                     } else {
                         Logger.w("not find class of this object");
                     }
