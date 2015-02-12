@@ -292,6 +292,10 @@ public class NetworkClient {
 			return completeAuditSession;
 		} catch (RetrofitError error) {
 			Logger.Log("Throw Error");
+            Logger.w(error.getMessage());
+            Logger.w(error.getBody().toString());
+            Logger.w(error.getCause().getMessage());
+            Logger.w(error.getCause().toString());
 			throw error;
 		}
 

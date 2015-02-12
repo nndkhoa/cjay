@@ -259,49 +259,41 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             return;
         }
 
-        // Remove from working session
-        dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
-
-        // Hide this button
-        btnCompleteRepair.setVisibility(View.GONE);
-
-        // Navigate to HomeActivity
-        getActivity().finish();
-
         // Xu ly cho session da duoc Giam Dinh
         if (mSession.getLocalStep() == Step.AUDIT.value) {
 
+            // Remove from working session
+            dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
+            // Check if this session has repair image or not
+            if (mSession.hasRepairImages()) {
+                btnCompleteRepair.setVisibility(View.VISIBLE);
+            } else {
+                // Navigate to HomeActivity
+                getActivity().finish();
+            }
+
             // Hide this button
             btnCompleteAudit.setVisibility(View.GONE);
-
-            // Navigate to HomeActivity
-            getActivity().finish();
 
             Logger.w("container id: " + mSession.getId());
 
             if (mSession.getId() == 0) {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
-
-                    Logger.w("upload status 1: " + auditItem.getUploadStatus());
-
                     if (auditItem.getId() == 0 && auditItem.isAudited()
                             && auditItem.getUploadStatus() != UploadStatus.UPLOADING.value) {
                         Logger.w("Set upload confirmed for audit item: " + auditItem.toString());
                         auditItem.setUploadConfirmed(true);
                         dataCenter.add(new UpdateAuditItemCommand(getActivity(), mSession.getContainerId(), auditItem));
+
+                        // 2015-02-12 Add to upload command
+                        auditItem.setSession(mSession.getId());
+                        UploadObject object = new UploadObject(auditItem, AuditItem.class, containerID, mSession.getId());
+                        dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
                     }
                 }
             } else {
                 for (AuditItem auditItem : mSession.getAuditItems()) {
-
-                    Logger.w("upload status 2: " + auditItem.getUploadStatus());
-
-                    if (auditItem.getUploadStatus() == UploadStatus.UPLOADING.value) {
-                        Logger.w("uploading = true");
-                    } else {
-                        Logger.w("uploading = false");
-                    }
-
                     if (auditItem.getId() != 0) {
                         Logger.w("Uploaded");
                     } else {
@@ -317,22 +309,14 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
                         }
                     }
                 }
-
-                mSession.prepareForUploading();
-                dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
-
-                UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
-                dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
-
-                // Check if this session has repair image or not
-                if (mSession.hasRepairImages()) {
-                    btnCompleteRepair.setVisibility(View.VISIBLE);
-                } else {
-
-                    // Remove from working session
-                    dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
-                }
             }
+
+            mSession.prepareForUploading();
+            dataCenter.add(new SaveSessionCommand(getActivity().getApplicationContext(), mSession));
+
+            UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+            dataCenter.add(new AddUploadObjectCommand(getActivity().getApplicationContext(), object));
+
         } else if (mSession.getLocalStep() == Step.REPAIR.value) {
 
             // Xu ly cho session da duoc sua chua
@@ -350,6 +334,15 @@ public class AuditAndRepairFragment extends Fragment implements ActionBar.TabLis
             } else {
                 Utils.showCrouton(getActivity(), "Sth goes wrong. Container Id " + containerID + " not found");
             }
+
+            // Remove from working session
+            dataCenter.add(new RemoveWorkingSessionCommand(getActivity(), containerID));
+
+            // Hide this button
+            btnCompleteRepair.setVisibility(View.GONE);
+
+            // Navigate to HomeActivity
+            getActivity().finish();
 
             mSession.prepareForUploading();
             dataCenter.add(new SaveSessionCommand(getActivity(), mSession));
