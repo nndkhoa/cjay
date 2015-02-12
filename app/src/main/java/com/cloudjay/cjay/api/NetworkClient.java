@@ -373,7 +373,7 @@ public class NetworkClient {
 	 * @param id
 	 */
 	public AuditItem getAuditItemById(long id) {
-		AuditItem auditItem = provider.getRestAdapter(context).create(NetworkService.class).getAuditItemById(id);
+   		AuditItem auditItem = provider.getRestAdapter(context).create(NetworkService.class).getAuditItemById(id);
 		return auditItem;
 	}
 

@@ -87,11 +87,12 @@ public class HomeActivity extends BaseActivity implements ActionBar.TabListener 
 			configureViewPager();
 
 			// Run job lấy tất cả sessions nếu chưa từng lấy lần nào
-			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
-			if (lastModifiedDate.isEmpty()) {
-				JobManager jobManager = App.getJobManager();
-				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
-			}
+            // 12-02-2015: Đéo cần luôn @nambv
+//			String lastModifiedDate = PreferencesUtil.getPrefsValue(this, PreferencesUtil.PREF_MODIFIED_DATE);
+//			if (lastModifiedDate.isEmpty()) {
+//				JobManager jobManager = App.getJobManager();
+//				jobManager.addJobInBackground(new FetchSessionsJob(lastModifiedDate));
+//			}
 		}
 
 		Utils.keepNotificationAlive(this);
