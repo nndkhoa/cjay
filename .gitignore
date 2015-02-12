@@ -22,7 +22,7 @@ realm_version_check.timestamp
 app/src/main/res/values/com_crashlytics_export_strings.xml
 /jobqueue/build
 app/src/main/assets/crashlytics-build.properties
-/keystore
+#/keystore
 /release
 <<<<<<< HEAD
 app/version.properties
