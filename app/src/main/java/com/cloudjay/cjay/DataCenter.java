@@ -1525,6 +1525,11 @@ public class DataCenter {
             db.put(containerId, session);
 
             return true;
+        } catch (KryoException e) {
+            Utils.showCrouton((android.app.Activity) context,
+                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+            e.printStackTrace();
+            Utils.writeErrorsToLogFile(e.toString());
         } catch (SnappydbException e) {
             Utils.writeErrorsToLogFile(e.toString());
         }

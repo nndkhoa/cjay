@@ -742,12 +742,14 @@ public class Utils {
         // create today String
         String today = StringUtils.getCurrentTimestamp(CJayConstant.DAY_FORMAT);
         // String prefix = "cjay-log-" + today;
+        String time = StringUtils.getCurrentTimestamp(CJayConstant.DAY_TIME_FORMAT);
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
             if (f.isFile() && f.getName().equals(CJayConstant.CJAY_ERROR_LOG_ALPHA)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
+                    buf.append(time + "| ");
                     buf.append(errorString);
                     buf.newLine();
                     buf.close();
