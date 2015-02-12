@@ -743,7 +743,7 @@ public class Utils {
 
         File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         for (File f : downloadDir.listFiles()) {
-            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_LOG_ALPHA)) {
+            if (f.isFile() && f.getName().equals(CJayConstant.CJAY_ERROR_LOG_ALPHA)) {
                 try {
                     BufferedWriter buf = new BufferedWriter(new FileWriter(f, true));
                     buf.append(errorString);
@@ -753,6 +753,23 @@ public class Utils {
                     e.printStackTrace();
                 }
                 break;
+            }
+        }
+    }
+
+    /*
+  * Create error log text file in Download Directory
+  * */
+    public static void createErrorLogFile() {
+
+        File errorLogFile =
+                new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS), CJayConstant.CJAY_ERROR_LOG_ALPHA);
+        if (!errorLogFile.exists()) {
+            try {
+                errorLogFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

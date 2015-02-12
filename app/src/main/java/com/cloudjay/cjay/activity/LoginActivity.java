@@ -145,6 +145,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         // Create log file
         Utils.createLogFile();
 
+        // Create error log file
+        Utils.createErrorLogFile();
+
 //        // Upload log file
 //        Utils.uploadLogFile(this);
 

@@ -82,4 +82,5 @@ public class CJayConstant {
     public static final String ACTION_PICK_MORE = "action_pick_more";
 
     public static final String CJAY_LOG_ALPHA = "cjay-log-alpha.txt";
+    public static final String CJAY_ERROR_LOG_ALPHA = "cjay_error_log_alpha.txt";
 }
