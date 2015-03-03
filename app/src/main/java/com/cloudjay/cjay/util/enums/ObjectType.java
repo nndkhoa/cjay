@@ -4,7 +4,8 @@ public enum ObjectType {
 
     SESSION(1),
     AUDIT_ITEM(2),
-    AUDIT_IMAGE(3);
+    AUDIT_IMAGE(3),
+    GATE_IMAGE(4);
 
     public final int value;
 

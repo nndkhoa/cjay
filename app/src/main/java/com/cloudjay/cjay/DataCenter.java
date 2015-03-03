@@ -22,6 +22,7 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.UploadModel;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
@@ -1786,4 +1787,14 @@ public class DataCenter {
             Utils.writeErrorsToLogFile(e.toString());
         }
     }
+
+    // region SQLite
+
+    public void saveUploadModel(Context context, Object object) {
+
+
+
+    }
+
+    // endregion
 }
