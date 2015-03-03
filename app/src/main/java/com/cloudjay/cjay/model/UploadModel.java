@@ -1,6 +1,7 @@
 package com.cloudjay.cjay.model;
 
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ContainerAdapter;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
@@ -8,6 +9,7 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
  * Created by nambv on 2015/03/03.
  */
 @Table(value = "upload")
+@ContainerAdapter
 public class UploadModel extends BaseModel {
 
     @Column(columnType = Column.PRIMARY_KEY_AUTO_INCREMENT)
@@ -18,6 +20,9 @@ public class UploadModel extends BaseModel {
 
     @Column(name = "object_type")
     int objectType;
+
+    @Column(name = "container_id")
+    String containerId;
 
     public int getId() {
         return id;
@@ -41,5 +46,13 @@ public class UploadModel extends BaseModel {
 
     public void setObjectType(int objectType) {
         this.objectType = objectType;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 }

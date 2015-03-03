@@ -45,6 +45,7 @@ import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.esotericsoftware.kryo.KryoException;
+import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
@@ -1655,14 +1656,19 @@ public class DataCenter {
 //        }
 
 		UploadModel model = new UploadModel();
+		Gson gson = new Gson();
 		if (object.getCls() == Session.class) {
 			model.setObjectType(ObjectType.SESSION.value);
+			model.setUploadObject(gson.toJson(object.getSession()));
 		} else if (object.getCls() == AuditItem.class) {
 			model.setObjectType(ObjectType.AUDIT_ITEM.value);
+			model.setUploadObject(gson.toJson(object.getAuditItem()));
 		} else if (object.getCls() == AuditItem.class) {
 			model.setObjectType(ObjectType.AUDIT_IMAGE.value);
+			model.setUploadObject(gson.toJson(object.getAuditImage()));
 		} else if (object.getCls() == GateImage.class) {
 			model.setObjectType(ObjectType.GATE_IMAGE.value);
+			model.setUploadObject(gson.toJson(object.getGateImage()));
 		}
 
 	}
@@ -1799,4 +1805,5 @@ public class DataCenter {
 			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
+
 }
