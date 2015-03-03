@@ -47,6 +47,7 @@ import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.esotericsoftware.kryo.KryoException;
 import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
 import com.snappydb.SnappydbException;
@@ -1674,19 +1675,20 @@ public class DataCenter {
 	}
 
 	public void remove(Context context) {
-		DB db = null;
-		try {
-			db = App.getDB(context);
-			KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
-			String[] keys = it.next(1);
-			it.close();
-			if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
-				Logger.Log("Delete item: " + keys[0]);
-				db.del(keys[0]);
-			}
-		} catch (SnappydbException e) {
-			Utils.writeErrorsToLogFile(e.toString());
-		}
+//		DB db = null;
+//		try {
+//			db = App.getDB(context);
+//			KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
+//			String[] keys = it.next(1);
+//			it.close();
+//			if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
+//				Logger.Log("Delete item: " + keys[0]);
+//				db.del(keys[0]);
+//			}
+//		} catch (SnappydbException e) {
+//			Utils.writeErrorsToLogFile(e.toString());
+//		}
+		new Select().from(UploadModel.class).querySingle().delete(false);
 	}
 
 	public UploadObject getNextItem(Context context) {
