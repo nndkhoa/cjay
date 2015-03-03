@@ -34,6 +34,7 @@ import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
 import com.path.android.jobqueue.network.NetworkUtil;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
@@ -111,12 +112,15 @@ public class App extends Application {
         configureSettings();
 //        generateSessionLogTextFile();
 
-//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().build());
-//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
-//				.detectLeakedClosableObjects().penaltyLog()
-//				.penaltyDeath().build());
+        // Init DB Flow
+        FlowManager.init(this);
+    }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        // Destroy DB Flow
+        FlowManager.destroy();
     }
 
     /**

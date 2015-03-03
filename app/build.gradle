@@ -9,6 +9,7 @@ buildscript {
 }
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     maven { url 'http://download.crashlytics.com/maven' }
@@ -143,6 +144,10 @@ dependencies {
     compile 'com.squareup:tape:1.2.3'
 
     compile project(":jobqueue")
+
+    apt 'com.raizlabs.android:DBFlow-Compiler:1.6.1'
+    compile "com.raizlabs.android:DBFlow-Core:1.6.1"
+    compile "com.raizlabs.android:DBFlow:1.6.1"
 }
 
 apt {

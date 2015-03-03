@@ -5,6 +5,7 @@ buildscript {
     repositories {
         jcenter()
 		maven { url 'http://download.crashlytics.com/maven' }
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
     }
 
     dependencies {
@@ -12,7 +13,7 @@ buildscript {
 		classpath 'com.github.ben-manes:gradle-jsonschema2pojo-plugin:0.1'
 		classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
 		classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
-
+        classpath 'com.raizlabs:Griddle:1.0.3'
 		classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
@@ -26,6 +27,7 @@ allprojects {
 		maven {
 			url "https://repo.commonsware.com.s3.amazonaws.com"
 		}
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
 	}
 
 	repositories {
