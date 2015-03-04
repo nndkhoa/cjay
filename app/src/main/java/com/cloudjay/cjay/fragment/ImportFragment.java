@@ -45,6 +45,7 @@ import com.cloudjay.cjay.task.command.session.update.AddUploadingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.AddWorkingSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
@@ -397,6 +398,7 @@ public class ImportFragment extends Fragment {
 
         // Add container session to upload queue
         UploadObject object = new UploadObject(mSession, Session.class, mSession.getContainerId());
+//        dataCenter.saveUploadObject(getActivity(), containerID, object);
         dataCenter.addUploadItem(object);
     }
 

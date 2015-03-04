@@ -56,6 +56,9 @@ public class UploadAuditItemJob extends Job {
         Context context = App.getInstance().getApplicationContext();
         DataCenter dataCenter = DataCenter_.getInstance_(context);
 
+        Logger.w("sessionId: " + sessionId);
+        Logger.w("auditItem: " + auditItem.toString());
+
         Logger.w("Upload audit item: " + auditItem.getComponentCode() + "| Session Id: " + sessionId);
 
         dataCenter.addLog(context, containerId, "Bắt đầu upload audit item: " + auditItem.getUuid(), CJayConstant.PREFIX_LOG);

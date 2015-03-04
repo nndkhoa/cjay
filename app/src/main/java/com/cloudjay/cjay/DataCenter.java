@@ -23,6 +23,7 @@ import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadModel;
+import com.cloudjay.cjay.model.UploadModel$Table;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
@@ -46,6 +47,7 @@ import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.esotericsoftware.kryo.KryoException;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.path.android.jobqueue.JobManager;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -56,6 +58,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -1659,22 +1662,24 @@ public class DataCenter {
 		UploadModel model = new UploadModel();
 		Gson gson = new Gson();
 		if (object.getCls() == Session.class) {
+            Logger.w("SESSION");
 			model.setObjectType(ObjectType.SESSION.value);
 			model.setUploadObject(gson.toJson(object.getSession()));
-			model.save(false);
 		} else if (object.getCls() == AuditItem.class) {
+            Logger.w("AUDIT_ITEM");
 			model.setObjectType(ObjectType.AUDIT_ITEM.value);
 			model.setUploadObject(gson.toJson(object.getAuditItem()));
-			model.save(false);
-		} else if (object.getCls() == AuditItem.class) {
+		} else if (object.getCls() == AuditImage.class) {
+            Logger.w("AUDIT_IMAGE");
 			model.setObjectType(ObjectType.AUDIT_IMAGE.value);
 			model.setUploadObject(gson.toJson(object.getAuditImage()));
-			model.save(false);
 		} else if (object.getCls() == GateImage.class) {
+            Logger.w("GATE_IMAGE");
 			model.setObjectType(ObjectType.GATE_IMAGE.value);
 			model.setUploadObject(gson.toJson(object.getGateImage()));
-			model.save(false);
 		}
+
+        model.save(false);
 
 	}
 
@@ -1720,54 +1725,75 @@ public class DataCenter {
 //		}
 //		return object;
 		UploadModel model = new Select().from(UploadModel.class).querySingle();
-		String uploadObject = model.getUploadObject();
-		Gson gson = new Gson();
-		if (model.getObjectType() == ObjectType.SESSION.value) {
-			Session session = gson.fromJson(uploadObject, Session.class);
-			UploadObject object = new UploadObject(session, Session.class, session.getContainerId());
-			return object;
-		} else if (model.getObjectType() == ObjectType.AUDIT_ITEM.value) {
-			AuditItem auditItem = gson.fromJson(uploadObject, AuditItem.class);
-			UploadObject object = new UploadObject(auditItem, AuditItem.class, model.getContainerId());
-			return object;
-		} else if (model.getObjectType() == ObjectType.AUDIT_IMAGE.value) {
-			AuditImage auditImage = gson.fromJson(uploadObject, AuditImage.class);
-			UploadObject object = new UploadObject(auditImage, AuditImage.class, model.getContainerId());
-			return object;
-		} else {
-			GateImage gateImage = gson.fromJson(uploadObject, GateImage.class);
-			UploadObject object = new UploadObject(gateImage, GateImage.class, model.getContainerId());
-			return object;
-		}
+
+        if (model != null) {
+
+            String uploadObject = model.getUploadObject();
+            Gson gson = new Gson();
+            if (model.getObjectType() == ObjectType.SESSION.value) {
+                Logger.w("SESSION");
+                Session session = gson.fromJson(uploadObject, Session.class);
+                UploadObject object = new UploadObject(session, Session.class, session.getContainerId());
+                return object;
+            } else if (model.getObjectType() == ObjectType.AUDIT_ITEM.value) {
+                Logger.w("AUDIT_ITEM");
+                AuditItem auditItem = gson.fromJson(uploadObject, AuditItem.class);
+                UploadObject object = new UploadObject(auditItem, AuditItem.class, model.getContainerId());
+                return object;
+            } else if (model.getObjectType() == ObjectType.AUDIT_IMAGE.value) {
+                Logger.w("AUDIT_IMAGE");
+                AuditImage auditImage = gson.fromJson(uploadObject, AuditImage.class);
+                UploadObject object = new UploadObject(auditImage, AuditImage.class, model.getContainerId());
+                return object;
+            } else {
+                Logger.w("GATE_IMAGE");
+                GateImage gateImage = gson.fromJson(uploadObject, GateImage.class);
+                UploadObject object = new UploadObject(gateImage, GateImage.class, model.getContainerId());
+                return object;
+            }
+        }
+
+        return null;
 	}
 
 	public UploadObject update(UploadObject object) {
 
+        Logger.w("update");
+
 		if (object.getCls() == Session.class) {
 
 //			Session session = getSession(context, object.getContainerId());
-			UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.CONTAINER_ID).eq(object.getContainerId())).and(Condition.column(UploadModel$Table.UPLOAD_TYPE).eq(ObjectType.SESSION.value)).querySingle();
-			String uploadObject = model.getUploadObject();
-			Gson gson = new Gson();
-			Session session = gson.fromJson(uploadObject,Session.class);
-			UploadObject newObject = new UploadObject(session, Session.class, session.getContainerId());
-			object = object.mergeCJayObject(newObject);
-			return object;
+			UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.OBJECT_TYPE).eq(ObjectType.SESSION.value)).querySingle();
+
+            if (model != null) {
+
+                String uploadObject = model.getUploadObject();
+                Gson gson = new Gson();
+                Session session = gson.fromJson(uploadObject, Session.class);
+                UploadObject newObject = new UploadObject(session, Session.class, session.getContainerId());
+                object = object.mergeCJayObject(newObject);
+                return object;
+            }
 
 		} else if (object.getCls() == AuditItem.class) {
 
-			UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.CONTAINER_ID).eq(object.getContainerId())).and(Condition.column(UploadModel$Table.UPLOAD_TYPE).eq(ObjectType.AUDIT_ITEM.value)).querySingle();
-			String uploadObject = model.getUploadObject();
-			Gson gson = new Gson();
-			Session session = gson.fromJson(uploadObject,Session.class);
-			AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
-			UploadObject newObject = new UploadObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
-			object.mergeCJayObject(newObject);
-			return object;
+			UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.OBJECT_TYPE).eq(ObjectType.AUDIT_ITEM.value)).querySingle();
+
+            if (model != null) {
+                String uploadObject = model.getUploadObject();
+                Gson gson = new Gson();
+                Session session = gson.fromJson(uploadObject, Session.class);
+                AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
+                UploadObject newObject = new UploadObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
+                object.mergeCJayObject(newObject);
+                return object;
+            }
 
 		} else {
 			return object;
 		}
+
+        return null;
 	}
 
 	//endregion
@@ -1838,5 +1864,24 @@ public class DataCenter {
 			Utils.writeErrorsToLogFile(e.toString());
 		}
 	}
+
+//    public void saveUploadObject(Context context, String containerId, UploadObject object) {
+//
+//        UploadModel model = new UploadModel();
+//        Gson gson = new Gson();
+//        model.setContainerId(containerId);
+//        model.setUploadObject(gson.toJson(object.getSession()));
+//        if (object.getCls() == Session.class) {
+//            model.setObjectType(ObjectType.SESSION.value);
+//        } else if (object.getCls() == AuditItem.class) {
+//            model.setObjectType(ObjectType.AUDIT_ITEM.value);
+//        } else if (object.getCls() == AuditImage.class) {
+//            model.setObjectType(ObjectType.AUDIT_IMAGE.value);
+//        } else if (object.getCls() == GateImage.class) {
+//            model.setObjectType(ObjectType.GATE_IMAGE.value);
+//        }
+//
+//        model.save(false);
+//    }
 
 }
