@@ -1664,17 +1664,21 @@ public class DataCenter {
 		if (object.getCls() == Session.class) {
             Logger.w("SESSION");
 			model.setObjectType(ObjectType.SESSION.value);
+			model.setContainerId(object.getContainerId());
 			model.setUploadObject(gson.toJson(object.getSession()));
 		} else if (object.getCls() == AuditItem.class) {
             Logger.w("AUDIT_ITEM");
 			model.setObjectType(ObjectType.AUDIT_ITEM.value);
+			model.setContainerId(object.getContainerId());
 			model.setUploadObject(gson.toJson(object.getAuditItem()));
 		} else if (object.getCls() == AuditImage.class) {
             Logger.w("AUDIT_IMAGE");
+			model.setContainerId(object.getContainerId());
 			model.setObjectType(ObjectType.AUDIT_IMAGE.value);
 			model.setUploadObject(gson.toJson(object.getAuditImage()));
 		} else if (object.getCls() == GateImage.class) {
             Logger.w("GATE_IMAGE");
+			model.setContainerId(object.getContainerId());
 			model.setObjectType(ObjectType.GATE_IMAGE.value);
 			model.setUploadObject(gson.toJson(object.getGateImage()));
 		}
