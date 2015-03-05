@@ -21,6 +21,7 @@ import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.task.command.session.get.GetListSessionsCommand;
 import com.cloudjay.cjay.task.command.session.update.ForceExportCommand;
 import com.cloudjay.cjay.util.CJayConstant;
+import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.enums.Step;
 
 import org.androidannotations.annotations.AfterViews;
@@ -69,6 +70,10 @@ public class WorkingFragment extends Fragment {
 
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
+
+        if (item.getId() != 0) {
+            dataCenter.saveSessionModel(getActivity(), item.getContainerId(), item.getId());
+        }
 
         if (item.getLocalStep() == Step.EXPORTED.value) {
             Toast.makeText(getActivity().getApplicationContext(),
