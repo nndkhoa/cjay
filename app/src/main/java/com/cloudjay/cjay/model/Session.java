@@ -765,7 +765,9 @@ public class Session implements Serializable {
 		//Merge local step from server should always greater or equal to step
 		if (this.getLocalStep() < newSession.getStep() && -1 == newSession.getLocalStep()) {
 			this.setLocalStep(newSession.getStep());
-		}
+		} else if (this.getLocalStep() == Step.AVAILABLE.value && newSession.getStep() == Step.REPAIR.value) {
+            this.setLocalStep(newSession.getStep());
+        }
 
 		// Merge Gate Images
 		// Tìm danh sách hình giống nhau, giữ danh sách local và set new id
