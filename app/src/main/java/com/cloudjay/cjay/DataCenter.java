@@ -1896,7 +1896,7 @@ public class DataCenter {
     public void saveSessionModel(Context context, String containerId, long sessionId) {
 
         // Check delete before save
-//        deleteSessionModels(context);
+        deleteSessionModels(context);
 
         SessionModel model = new Select().from(SessionModel.class)
                 .where(Condition.column(SessionModel$Table.SESSION_ID).eq(containerId))
@@ -1936,7 +1936,7 @@ public class DataCenter {
      */
     public void deleteSessionModels(Context context) {
 
-        long count = new Select().from(SessionModel.class).count();
+        long count = new Select().from(SessionModel.class).where().count();
         if (count >= 150) {
             SessionModel sessionModel = new Select().from(SessionModel.class).querySingle();
             long id = sessionModel.getId();
