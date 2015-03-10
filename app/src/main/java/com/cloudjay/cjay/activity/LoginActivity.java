@@ -249,8 +249,8 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 	void doAfterViews() {
 
         // Set for debugger
-        etEmail.setText("giamdinhcong@test.com");
-        etPassword.setText("123456");
+//        etEmail.setText("giamdinhcong@test.com");
+//        etPassword.setText("123456");
 
 		// Config EditText Password auto login when user press Enter
 		etPassword.setOnKeyListener(new View.OnKeyListener() {
