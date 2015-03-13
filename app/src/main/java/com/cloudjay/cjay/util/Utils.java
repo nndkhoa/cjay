@@ -29,6 +29,8 @@ import com.cloudjay.cjay.model.AuditImage;
 import com.cloudjay.cjay.model.AuditItem;
 import com.cloudjay.cjay.model.GateImage;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.SessionModel;
+import com.cloudjay.cjay.model.UploadModel;
 import com.cloudjay.cjay.task.service.PubnubService_;
 import com.cloudjay.cjay.task.service.QueryService_;
 import com.cloudjay.cjay.task.service.UploadIntentService_;
@@ -36,6 +38,7 @@ import com.cloudjay.cjay.task.service.UploadLogService_;
 import com.cloudjay.cjay.util.enums.ImageType;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.pubnub.api.Pubnub;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
@@ -135,6 +138,10 @@ public class Utils {
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
+
+        // Delete sqlite
+        Delete.table(SessionModel.class);
+        Delete.table(UploadModel.class);
     }
 
     /**

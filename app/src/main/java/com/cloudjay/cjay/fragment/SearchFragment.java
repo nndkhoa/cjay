@@ -159,6 +159,10 @@ public class SearchFragment extends Fragment {
 		// navigation to Wizard Activity
 		Session item = mAdapter.getItem(position);
 
+        if (item.getId() != 0) {
+            dataCenter.saveSessionModel(getActivity(), item.getContainerId(), item.getId());
+        }
+
         if (item.getLocalStep() == Step.EXPORTED.value) {
             Toast.makeText(getActivity().getApplicationContext(),
                     getActivity().getResources().getText(R.string.warning_exported_container),

@@ -22,6 +22,10 @@ import com.cloudjay.cjay.model.IsoCode;
 import com.cloudjay.cjay.model.LogItem;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.model.Session;
+import com.cloudjay.cjay.model.SessionModel;
+import com.cloudjay.cjay.model.SessionModel$Table;
+import com.cloudjay.cjay.model.UploadModel;
+import com.cloudjay.cjay.model.UploadModel$Table;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.model.User;
 import com.cloudjay.cjay.task.command.Command;
@@ -38,14 +42,18 @@ import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.StringUtils;
 import com.cloudjay.cjay.util.Utils;
 import com.cloudjay.cjay.util.enums.ImageType;
+import com.cloudjay.cjay.util.enums.ObjectType;
 import com.cloudjay.cjay.util.enums.Step;
 import com.cloudjay.cjay.util.enums.UploadStatus;
 import com.cloudjay.cjay.util.enums.UploadType;
 import com.cloudjay.cjay.util.exception.NullCredentialException;
 import com.esotericsoftware.kryo.KryoException;
+import com.google.gson.Gson;
 import com.path.android.jobqueue.JobManager;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Delete;
+import com.raizlabs.android.dbflow.sql.language.Select;
 import com.snappydb.DB;
-import com.snappydb.KeyIterator;
 import com.snappydb.SnappydbException;
 
 import org.androidannotations.annotations.Background;
@@ -873,7 +881,7 @@ public class DataCenter {
                 Logger.w(e1.getMessage());
                 return null;
             }
-        }  catch (KryoException e) {
+        } catch (KryoException e) {
             Utils.showCrouton((android.app.Activity) context,
                     "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
             e.printStackTrace();
@@ -1622,100 +1630,191 @@ public class DataCenter {
 
     public void enqueue(Context context, String containerId, UploadObject object) {
 
-        try {
-            DB db = App.getDB(context);
+//        try {
+//            DB db = App.getDB(context);
+//
+//            Logger.Log("class in enqueue: " + object.getCls());
+//
+//            // Reset index if there is no item left in the queue
+//            int leftCount = db.countKeys(CJayConstant.PREFIX_UPLOAD_QUEUE);
+//            if (leftCount == 0) {
+//                Logger.w("Reset index to 0");
+//                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
+//            }
+//
+//            Logger.w("leftCount: " + leftCount);
+//
+//            // Enqueue
+//            int currentIndex = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
+//
+//            if (leftCount > 0) {
+//                currentIndex = currentIndex + 1;
+//                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, currentIndex);
+//            }
+//
+//            String key = CJayConstant.PREFIX_UPLOAD_QUEUE + currentIndex + ":" + containerId;
+//            Logger.Log("key in enqueue: " + key);
+//            db.put(key, object);
+//
+//        } catch (SnappydbException e) {
+//            Utils.writeErrorsToLogFile(e.toString());
+//        }
 
-            Logger.Log("class in enqueue: " + object.getCls());
-
-            // Reset index if there is no item left in the queue
-            int leftCount = db.countKeys(CJayConstant.PREFIX_UPLOAD_QUEUE);
-            if (leftCount == 0) {
-                Logger.w("Reset index to 0");
-                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
+        UploadModel model = new UploadModel();
+        Gson gson = new Gson();
+        if (object.getCls() == Session.class) {
+            Logger.w("SESSION");
+            model.setObjectType(ObjectType.SESSION.value);
+            model.setContainerId(object.getContainerId());
+            model.setUploadObject(gson.toJson(object.getSession()));
+        } else if (object.getCls() == AuditItem.class) {
+            Logger.w("AUDIT_ITEM");
+            SessionModel sessionModel = getSessionModel(context, containerId);
+            if (sessionModel != null) {
+                Logger.w("sessionId: " + sessionModel.getSessionPrimaryKey());
+                object.setSessionId(sessionModel.getSessionPrimaryKey());
             }
-
-            Logger.w("leftCount: " + leftCount);
-
-            // Enqueue
-            int currentIndex = PreferencesUtil.getPrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, 0);
-
-            if (leftCount > 0) {
-                currentIndex = currentIndex + 1;
-                PreferencesUtil.storePrefsValue(context, PreferencesUtil.PREF_UPLOAD_QUEUE_INDEX, currentIndex);
-            }
-
-            String key = CJayConstant.PREFIX_UPLOAD_QUEUE + currentIndex + ":" + containerId;
-            Logger.Log("key in enqueue: " + key);
-            db.put(key, object);
-
-        } catch (SnappydbException e) {
-            Utils.writeErrorsToLogFile(e.toString());
+            model.setObjectType(ObjectType.AUDIT_ITEM.value);
+            model.setContainerId(object.getContainerId());
+            model.setUploadObject(gson.toJson(object.getAuditItem()));
+        } else if (object.getCls() == AuditImage.class) {
+            Logger.w("AUDIT_IMAGE");
+            model.setContainerId(object.getContainerId());
+            model.setObjectType(ObjectType.AUDIT_IMAGE.value);
+            model.setUploadObject(gson.toJson(object.getAuditImage()));
+        } else if (object.getCls() == GateImage.class) {
+            Logger.w("GATE_IMAGE");
+            model.setContainerId(object.getContainerId());
+            model.setObjectType(ObjectType.GATE_IMAGE.value);
+            model.setUploadObject(gson.toJson(object.getGateImage()));
         }
+
+        model.save(false);
+
     }
 
     public void remove(Context context) {
-        DB db = null;
-        try {
-            db = App.getDB(context);
-            KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
-            String[] keys = it.next(1);
-            it.close();
-            if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
-                Logger.Log("Delete item: " + keys[0]);
-                db.del(keys[0]);
-            }
-        } catch (SnappydbException e) {
-            Utils.writeErrorsToLogFile(e.toString());
-        }
+//		DB db = null;
+//		try {
+//			db = App.getDB(context);
+//			KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
+//			String[] keys = it.next(1);
+//			it.close();
+//			if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
+//				Logger.Log("Delete item: " + keys[0]);
+//				db.del(keys[0]);
+//			}
+//		} catch (SnappydbException e) {
+//			Utils.writeErrorsToLogFile(e.toString());
+//		}
+        new Select().from(UploadModel.class).querySingle().delete(false);
     }
 
     public UploadObject getNextItem(Context context) {
 
-        UploadObject object = null;
-        try {
-            DB db = App.getDB(context);
-            KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
-            String[] keys = it.next(1);
-            it.close();
+//		UploadObject object = null;
+//		try {
+//			DB db = App.getDB(context);
+//			KeyIterator it = db.findKeysIterator(CJayConstant.PREFIX_UPLOAD_QUEUE);
+//			String[] keys = it.next(1);
+//			it.close();
+//
+//			if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
+//				object = db.getObject(keys[0], UploadObject.class);
+//
+//				Logger.Log("keys length: " + keys.length);
+//				Logger.Log("class in getNextItem: " + object.getCls());
+//			}
+//
+//		} catch (KryoException e1) {
+//			Utils.showCrouton((android.app.Activity) context,
+//					"Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+//			e1.printStackTrace();
+//		} catch (SnappydbException e) {
+//			Utils.writeErrorsToLogFile(e.toString());
+//		}
+//		return object;
+        UploadModel model = new Select().from(UploadModel.class).querySingle();
 
-            if (null != keys && keys.length > 0 && keys[0].contains(CJayConstant.PREFIX_UPLOAD_QUEUE)) {
-                object = db.getObject(keys[0], UploadObject.class);
+        if (model != null) {
 
-                Logger.Log("keys length: " + keys.length);
-                Logger.Log("class in getNextItem: " + object.getCls());
+            String uploadObject = model.getUploadObject();
+            Gson gson = new Gson();
+            if (model.getObjectType() == ObjectType.SESSION.value) {
+                Logger.w("SESSION");
+                Session session = gson.fromJson(uploadObject, Session.class);
+                UploadObject object = new UploadObject(session, Session.class, session.getContainerId());
+                return object;
+            } else if (model.getObjectType() == ObjectType.AUDIT_ITEM.value) {
+                Logger.w("AUDIT_ITEM");
+                AuditItem auditItem = gson.fromJson(uploadObject, AuditItem.class);
+                SessionModel sessionModel = getSessionModel(context, model.getContainerId());
+                if (sessionModel != null) {
+                    Logger.w("sessionId: " + sessionModel.getSessionPrimaryKey());
+                    UploadObject object = new UploadObject(
+                            auditItem, AuditItem.class, model.getContainerId(), sessionModel.getSessionPrimaryKey());
+                    return object;
+                }
+                return null;
+            } else if (model.getObjectType() == ObjectType.AUDIT_IMAGE.value) {
+                Logger.w("AUDIT_IMAGE");
+                AuditImage auditImage = gson.fromJson(uploadObject, AuditImage.class);
+                UploadObject object = new UploadObject(auditImage, AuditImage.class, model.getContainerId());
+                return object;
+            } else {
+                Logger.w("GATE_IMAGE");
+                GateImage gateImage = gson.fromJson(uploadObject, GateImage.class);
+                UploadObject object = new UploadObject(gateImage, GateImage.class, model.getContainerId());
+                return object;
             }
-
-        } catch (KryoException e1) {
-            Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
-            e1.printStackTrace();
-        } catch (SnappydbException e) {
-            Utils.writeErrorsToLogFile(e.toString());
         }
 
-        return object;
+        return null;
     }
 
     public UploadObject update(UploadObject object) {
 
+        Logger.w("update");
+
         if (object.getCls() == Session.class) {
 
-            Session session = getSession(context, object.getContainerId());
-            UploadObject newObject = new UploadObject(session, Session.class, session.getContainerId());
-            object = object.mergeCJayObject(newObject);
-            return object;
+//			Session session = getSession(context, object.getContainerId());
+            UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.OBJECT_TYPE).eq(ObjectType.SESSION.value)).querySingle();
+
+            if (model != null) {
+
+                String uploadObject = model.getUploadObject();
+                Gson gson = new Gson();
+                Session session = gson.fromJson(uploadObject, Session.class);
+                UploadObject newObject = new UploadObject(session, Session.class, session.getContainerId());
+                object = object.mergeCJayObject(newObject);
+                return object;
+            }
 
         } else if (object.getCls() == AuditItem.class) {
 
-            Session session = getSession(context, object.getContainerId());
-            AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
-            UploadObject newObject = new UploadObject(auditItem, AuditItem.class, object.getContainerId(), session.getId());
-            object.mergeCJayObject(newObject);
-            return object;
+            UploadModel model = new Select().from(UploadModel.class).where(Condition.column(UploadModel$Table.OBJECT_TYPE).eq(ObjectType.AUDIT_ITEM.value)).querySingle();
+
+            if (model != null) {
+//                String uploadObject = model.getUploadObject();
+//                Gson gson = new Gson();
+//                Session session = gson.fromJson(uploadObject, Session.class);
+                SessionModel sessionModel = getSessionModel(context, object.getContainerId());
+                if (sessionModel != null) {
+                    AuditItem auditItem = getAuditItem(context, object.getContainerId(), object.getAuditItem().getUuid());
+                    UploadObject newObject = new UploadObject(auditItem, AuditItem.class,
+                            object.getContainerId(), sessionModel.getSessionPrimaryKey());
+                    object.mergeCJayObject(newObject);
+                    return object;
+                }
+                return null;
+            }
 
         } else {
             return object;
         }
+
+        return null;
     }
 
     //endregion
@@ -1786,4 +1885,66 @@ public class DataCenter {
             Utils.writeErrorsToLogFile(e.toString());
         }
     }
+
+    /**
+     * Save session id received from server to Sqlite
+     *
+     * @param context
+     * @param containerId
+     * @param sessionId
+     */
+    public void saveSessionModel(Context context, String containerId, long sessionId) {
+
+        // Check delete before save
+        deleteSessionModels(context);
+
+        SessionModel model = new Select().from(SessionModel.class)
+                .where(Condition.column(SessionModel$Table.SESSION_ID).eq(containerId))
+                .and(Condition.column(SessionModel$Table.SESSION_PRIMARY_KEY).eq(sessionId))
+                .querySingle();
+        if (null == model) {
+            model = new SessionModel();
+            model.setSessionId(containerId);
+            model.setSessionPrimaryKey(sessionId);
+
+            model.save(false);
+        }
+    }
+
+    /**
+     * Get session model by containerId
+     *
+     * @param context
+     * @param containerId
+     * @return
+     */
+    public SessionModel getSessionModel(Context context, String containerId) {
+
+        SessionModel model = new Select().from(SessionModel.class)
+                .where(Condition.column(SessionModel$Table.SESSION_ID).eq(containerId))
+                .querySingle();
+
+        if (model != null) {
+            return model;
+        }
+        return null;
+    }
+
+    /**
+     * Delete session models
+     * @param context
+     */
+    public void deleteSessionModels(Context context) {
+
+        long count = new Select().from(SessionModel.class).where().count();
+        if (count >= 150) {
+            SessionModel sessionModel = new Select().from(SessionModel.class).querySingle();
+            long id = sessionModel.getId();
+            for (long i = id; i < id + 100; i++) {
+                new Delete().from(SessionModel.class).where(Condition.column(SessionModel$Table.ID).eq(i))
+                        .query();
+            }
+        }
+    }
+
 }

@@ -9,7 +9,6 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.model.Session;
 import com.cloudjay.cjay.model.UploadObject;
 import com.cloudjay.cjay.task.command.log.AddLogCommand;
-import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.task.command.session.update.SaveSessionCommand;
 import com.cloudjay.cjay.util.CJayConstant;
 import com.cloudjay.cjay.util.Logger;
@@ -63,6 +62,10 @@ public class UploadSessionJob extends Job {
 		// Network operation. It may throw an network exception that will be handle by `shouldReRunOnThrowable`
 		Step uploadStep = Step.values()[x];
 		Session response = dataCenter.uploadSession(context, mSession, uploadStep);
+
+        // Save sessionId and containerId into sqlite
+        dataCenter.saveSessionModel(context, mSession.getContainerId(), response.getId());
+
 		dataCenter.add(new AddLogCommand(context, response.getContainerId(), "Upload container thành công", CJayConstant.PREFIX_LOG));
 
 		// Save session and also notify success to Upload Fragment by posting UploadSucceededEvent in SaveSessionCommand

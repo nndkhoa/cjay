@@ -12,12 +12,9 @@ import com.cloudjay.cjay.event.upload.UploadStoppedEvent;
 import com.cloudjay.cjay.event.upload.UploadSucceededEvent;
 import com.cloudjay.cjay.task.command.UploadQueue;
 import com.cloudjay.cjay.task.command.cjayobject.StartUploadingCommand;
-import com.cloudjay.cjay.task.command.session.remove.RemoveSessionCommand;
 import com.cloudjay.cjay.util.Logger;
 import com.cloudjay.cjay.util.PreferencesUtil;
 import com.cloudjay.cjay.util.Utils;
-import com.cloudjay.cjay.util.enums.Step;
-import com.cloudjay.cjay.util.enums.UploadType;
 import com.path.android.jobqueue.JobManager;
 
 import org.androidannotations.annotations.Bean;
@@ -25,7 +22,6 @@ import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.Trace;
 
 import de.greenrobot.event.EventBus;
-import retrofit.RetrofitError;
 
 /**
  * This intent service should be called in 2 cases:
