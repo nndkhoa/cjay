@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -38,9 +37,6 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
-
-import java.io.File;
-import java.io.IOException;
 
 public class App extends Application {
 
