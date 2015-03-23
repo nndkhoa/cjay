@@ -5,6 +5,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
+import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.cloudjay.cjay.event.operator.OperatorChosenEvent;
 import com.cloudjay.cjay.event.operator.OperatorsGotEvent;
 import com.cloudjay.cjay.model.Operator;
 import com.cloudjay.cjay.task.command.operator.SearchOperatorCommand;
+import com.cloudjay.cjay.util.Logger;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -28,10 +30,6 @@ import org.androidannotations.annotations.TextChange;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -39,78 +37,87 @@ import de.greenrobot.event.EventBus;
 @EFragment(R.layout.dialog_select_operator)
 public class SearchOperatorDialog extends DialogFragment {
 
-	List<Operator> operators;
-	OperatorAdapter operatorAdapter;
+    List<Operator> operators;
+    OperatorAdapter operatorAdapter;
 
-	@ViewById(R.id.et_operator_name)
-	EditText etOperatorName;
+    @ViewById(R.id.et_operator_name)
+    EditText etOperatorName;
 
-	@ViewById(R.id.lv_operators_list)
-	ListView lvOperators;
+    @ViewById(R.id.lv_operators_list)
+    ListView lvOperators;
 
-	@Bean
-	DataCenter dataCenter;
+    @Bean
+    DataCenter dataCenter;
 
     @SystemService
     InputMethodManager inputMethodManager;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		EventBus.getDefault().register(this);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
 
-	@Override
-	public void onDestroy() {
-		EventBus.getDefault().unregister(this);
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
-	@UiThread
-	public void onEvent(OperatorsGotEvent event) {
-		// Retrieve list operators
-		operators = event.getOperators();
-		// Init and set adapter
-		if (null == operatorAdapter) {
-			operatorAdapter = new OperatorAdapter(getActivity(), operators);
-			lvOperators.setAdapter(operatorAdapter);
-		}
+    @UiThread
+    public void onEvent(OperatorsGotEvent event) {
+        // Retrieve list operators
+        operators = event.getOperators();
 
-		// Notify change
-		operatorAdapter.swapOperators(operators);
+        Operator undefinedOperator = new Operator();
+        undefinedOperator.setId(367);
+        undefinedOperator.setOperatorCode("KXD");
+        undefinedOperator.setOperatorName("Can bo sung");
 
-	}
+        operators.remove(undefinedOperator);
+        operators.add(0, undefinedOperator);
 
-	@AfterViews
-	void doAfterViews() {
-		// Set title for search operator dialog
-		getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
+        // Init and set adapter
+        if (null == operatorAdapter) {
+            operatorAdapter = new OperatorAdapter(getActivity(), operators);
+            lvOperators.setAdapter(operatorAdapter);
+        }
+
+        // Notify change
+        operatorAdapter.swapOperators(operators);
+
+    }
+
+    @AfterViews
+    void doAfterViews() {
+        // Set title for search operator dialog
+        getDialog().setTitle(getResources().getString(R.string.dialog_operator_title));
 
 //		// Begin to get operators from cache
-		dataCenter.add(new SearchOperatorCommand(getActivity(), ""));
+        dataCenter.add(new SearchOperatorCommand(getActivity(), ""));
 
         // show keyboard
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
-	@ItemClick(R.id.lv_operators_list)
-	void listViewOperatorsItemClicked(Operator selectedOperator) {
-		EventBus.getDefault().post(new OperatorChosenEvent(selectedOperator));
-		this.dismiss();
-	}
+    @ItemClick(R.id.lv_operators_list)
+    void listViewOperatorsItemClicked(Operator selectedOperator) {
+        EventBus.getDefault().post(new OperatorChosenEvent(selectedOperator));
+        this.dismiss();
+    }
 
-	@AfterTextChange(R.id.et_operator_name)
-	void search(Editable text) {
-		String keyword = text.toString();
-		dataCenter.add(new SearchOperatorCommand(getActivity(), keyword));
-	}
+    @AfterTextChange(R.id.et_operator_name)
+    void search(Editable text) {
+        String keyword = text.toString();
+        dataCenter.add(new SearchOperatorCommand(getActivity(), keyword));
+    }
 
-	@TextChange(R.id.et_operator_name)
-	void upperCase(){
-		etOperatorName.setInputType(InputType.TYPE_CLASS_TEXT
-				| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-	}
+    @TextChange(R.id.et_operator_name)
+    void upperCase() {
+        etOperatorName.setInputType(InputType.TYPE_CLASS_TEXT
+                | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+    }
 
-	public void setParent(Fragment parent) {
-	}
+    public void setParent(Fragment parent) {
+    }
 }

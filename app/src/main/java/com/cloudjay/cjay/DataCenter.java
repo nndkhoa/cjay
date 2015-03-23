@@ -215,7 +215,7 @@ public class DataCenter {
             Utils.writeErrorsToLogFile(e.toString());
         } catch (KryoException e) {
             Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                    "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
             e.printStackTrace();
         }
         return operators;
@@ -760,7 +760,7 @@ public class DataCenter {
         } catch (KryoException e) {
             Utils.writeErrorsToLogFile(e.toString());
             Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                    "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
             e.printStackTrace();
         } finally {
             return session;
@@ -781,7 +781,7 @@ public class DataCenter {
             Utils.writeErrorsToLogFile(e.toString());
         } catch (KryoException e) {
             Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                    "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
             e.printStackTrace();
         }
 
@@ -799,7 +799,7 @@ public class DataCenter {
                 sessions.add(session);
             } catch (KryoException e1) {
                 Utils.showCrouton((android.app.Activity) context,
-                        "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                        "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
                 e1.printStackTrace();
             } catch (SnappydbException e) {
                 Utils.writeErrorsToLogFile(e.toString());
@@ -935,7 +935,7 @@ public class DataCenter {
             }
         } catch (KryoException e) {
             Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                    "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
             e.printStackTrace();
         }
 
@@ -1626,7 +1626,7 @@ public class DataCenter {
             return true;
         } catch (KryoException e) {
             Utils.showCrouton((android.app.Activity) context,
-                    "Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+                    "CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
             e.printStackTrace();
             Utils.writeErrorsToLogFile(e.toString());
         } catch (SnappydbException e) {
@@ -1828,7 +1828,7 @@ public class DataCenter {
 //
 //		} catch (KryoException e1) {
 //			Utils.showCrouton((android.app.Activity) context,
-//					"Có lỗi xảy ra, vui lòng đăng nhập lại", Style.ALERT);
+//					"CƠ SỞ DỮ LIỆU CÓ VẤN ĐỀ. XIN VUI LÒNG LIÊN HỆ HỖ TRỢ CLOUDJAY", Style.ALERT);
 //			e1.printStackTrace();
 //		} catch (SnappydbException e) {
 //			Utils.writeErrorsToLogFile(e.toString());

@@ -86,7 +86,8 @@
         <activity
             android:name="com.cloudjay.cjay.activity.ReportIssueActivity_"
             android:label="@string/title_activity_report_issue"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible"/>
         <activity
             android:name="com.cloudjay.cjay.activity.WizardActivity_"
             android:label="@string/title_activity_main_process"

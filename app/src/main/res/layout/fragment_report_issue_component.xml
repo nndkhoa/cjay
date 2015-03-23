@@ -23,7 +23,7 @@
 
     <ListView
         android:id="@+id/lv_component"
-        style="@style/IssueReportList"
-        android:textFilterEnabled="false" />
+        style="@style/IssueReportList"/>
+        <!--android:textFilterEnabled="false" />-->
 
 </LinearLayout>
