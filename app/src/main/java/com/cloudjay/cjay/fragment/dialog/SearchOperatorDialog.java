@@ -72,7 +72,7 @@ public class SearchOperatorDialog extends DialogFragment {
         Operator undefinedOperator = new Operator();
         undefinedOperator.setId(367);
         undefinedOperator.setOperatorCode("KXD");
-        undefinedOperator.setOperatorName("Can bo sung");
+        undefinedOperator.setOperatorName("Cần bổ sung");
 
         operators.remove(undefinedOperator);
         operators.add(0, undefinedOperator);
